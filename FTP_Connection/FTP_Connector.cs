@@ -31,8 +31,9 @@ namespace FTP_Connection {
             }
         }
 
-        public void DownloadFile(string fileName = "vh_update.txt") {
+        public bool DownloadFile(string fileName = "vh_update.txt") {
             int i = 1;
+            bool error = false;
             FtpWebRequest request = connect(fileName);
             try {
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
@@ -64,16 +65,16 @@ namespace FTP_Connection {
                     }
                     catch(Exception e) {
                         Console.WriteLine(String.Format("Cannot create directory: {0} because {1}",downloadDir, e.Message));
-                        return;
+                        return false;
                     }
                 }
-                if(File.Exists(downloadDir+fileName)) {
+                if(File.Exists(downloadDir+fileName) && !error) {
                     try {
                         File.Delete(downloadDir + fileName);
                     }
                     catch(Exception e) {
                         Console.WriteLine(String.Format("Cannot delete file: {0} because", downloadDir + fileName, e.Message));
-                        return;
+                        return false;
                     }
                 }
                 try {
@@ -86,12 +87,14 @@ namespace FTP_Connection {
                 }
                 catch(Exception e) {
                     Console.WriteLine(String.Format("Cannot download {0} to {1} because: ", host + fileName, downloadDir + fileName));
-                    return;
+                    return false;
                 }
+                return true;
             }
             catch(Exception e) {
                 Console.WriteLine(String.Format("[FtpDirList] Exception at {0}: {1}", i, e.Message));
             }
+            return true;
         }
 
     }
